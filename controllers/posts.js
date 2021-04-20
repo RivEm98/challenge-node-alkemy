@@ -3,7 +3,8 @@ const db = require('../database/models')
 module.exports = {
     list:(req,res)=>{
         db.Posts.findAll({
-            attributes: ['id','title','image','category','date']
+            attributes: ['id','title','image','category','date'],
+            order:[['date','DESC']]
         })
         .then(data=>{
             res.send(data)
@@ -28,26 +29,31 @@ module.exports = {
     },
     create:(req,res)=>{
         let {title, content, image ,category} = req.body
-        if (title && content && category) {
-            db.Posts.create({
-                title: title,
-                content: content,
-                image: image,
-                category: category,
-            })
-            .then(data=>{
-                res.send('Post created successfully')
-            })
-            .catch(error=>{
-                res.send(error)
-            })
+        if (image.includes('.png')||image.includes('.jpg')) {
+            if (title && content && category) {
+                db.Posts.create({
+                    title: title,
+                    content: content,
+                    image: image,
+                    category: category,
+                })
+                .then(data=>{
+                    res.send({msg:'Post created successfully'})
+                })
+                .catch(error=>{
+                    res.send(error)
+                })
+            }else{
+                res.send({msg:'Title, Content and Category be required'})
+            }
         }else{
-            res.send({msg:'Title, Content and Category be required'})
+            res.send({msg:'The url of the image must have a .jpg or .png extension'})
         }
     },
-    update:(req,res)=>{
+    update:(req,res,next)=>{
         let {title, content, image ,category} = req.body
-        db.Posts.update({
+        let posts = db.Posts.findOne({where:{id:req.params.id}})
+        let upd = db.Posts.update({
             title: title,
             content: content,
             image: image,
@@ -57,11 +63,16 @@ module.exports = {
                 id:req.params.id
             }
         })
+        Promise.all([posts, upd])
         .then(data=>{
-            res.send({msg:'Post updated successfully'})
+            if (data[0]==null) {//pregunto si el posteo no existe
+                res.send({msg:'The post you are trying to update does not exist'})
+            }else{
+                res.send({msg:'Post updated successfully'})
+            }
         })
         .catch(error=>{
-            res.send({msg:'The post you are trying to update does not exist'})
+            console.log(error);
         })
     },
     delete:(req,res)=>{
