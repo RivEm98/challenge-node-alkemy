@@ -58,10 +58,20 @@ module.exports = {
             }
         })
         .then(data=>{
-            res.send('Post updated successfully')
+            res.send({msg:'Post updated successfully'})
         })
         .catch(error=>{
-            res.send('The post you are trying to update does not exist')
+            res.send({msg:'The post you are trying to update does not exist'})
+        })
+    },
+    deleteOp:(req,res)=>{
+        db.Posts.destroy({
+            where:{
+                id:req.params.id
+            }
+        })
+        .catch(error=>{
+            res.send({msg:'The post you are trying to delete does not exist'})
         })
     }
 }

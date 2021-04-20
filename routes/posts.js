@@ -9,7 +9,9 @@ router.get('/:id', controllers.detail);
 //create of post
 router.post('/', controllers.create);
 //update post
-router.put('/', controllers.update);
+router.put('/:id', controllers.update);
+//delete post
+router.delete('/:id', controllers.delete);
 
 
 module.exports = router;
