@@ -25,5 +25,43 @@ module.exports = {
         .catch(error=>{
             res.send(error)
         })
+    },
+    create:(req,res)=>{
+        let {title, content, image ,category} = req.body
+        if (title && content && category) {
+            db.Posts.create({
+                title: title,
+                content: content,
+                image: image,
+                category: category,
+            })
+            .then(data=>{
+                res.send('Post created successfully')
+            })
+            .catch(error=>{
+                res.send(error)
+            })
+        }else{
+            res.send({msg:'Title, Content and Category be required'})
+        }
+    },
+    update:(req,res)=>{
+        let {title, content, image ,category} = req.body
+        db.Posts.update({
+            title: title,
+            content: content,
+            image: image,
+            category: category,
+        },{
+            where:{
+                id:req.params.id
+            }
+        })
+        .then(data=>{
+            res.send('Post updated successfully')
+        })
+        .catch(error=>{
+            res.send('The post you are trying to update does not exist')
+        })
     }
 }
